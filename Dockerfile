@@ -16,6 +16,9 @@ RUN echo 'source /opt/intel/oneapi/setvars.sh > /dev/null' >> /etc/bash.bashrc
 
 # Build environment
 ENV MKLROOT=/opt/intel/oneapi/mkl/latest
+ENV PATH="/opt/intel/oneapi/mpi/latest/bin:${PATH}"
+ENV LD_LIBRARY_PATH="/opt/intel/oneapi/mpi/latest/lib/release:/opt/intel/oneapi/mpi/latest/libfabric/lib:/opt/intel/oneapi/mkl/latest/lib/intel64:/opt/intel/oneapi/compiler/latest/lib/intel64_lin:${LD_LIBRARY_PATH}"
+ENV LIBRARY_PATH="/opt/intel/oneapi/mpi/latest/lib/release:/opt/intel/oneapi/mkl/latest/lib/intel64:/opt/intel/oneapi/compiler/latest/lib/intel64_lin:${LIBRARY_PATH}"
 ENV CC=mpiicc \
     CXX=mpiicpc \
     FC=mpiifort \
@@ -29,7 +32,7 @@ ENV CFLAGS="-O3 -xHost" \
 
 # FFTW include/libs (system FFTW)
 ENV FFTW_INCLUDE="/usr/include" \
-    FFT_LIBS="-lfftw3 -lfftw3_threads"
+    FFTW_LIBS="-lfftw3 -lfftw3_threads"
 
 # MKL BLAS/LAPACK + ScaLAPACK/BLACS (Intel MPI interface)
 # Use the recommended start/end-group to resolve symbols
