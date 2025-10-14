@@ -1,0 +1,52 @@
+services:
+  qe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        QE_TAG: "qe-7.5"
+        MAKEJ: "20"
+    image: qe:7.5-oneapi-mkl
+
+    # Limit container CPU to 20 logical cores
+    cpus: "20"
+    # (Optional) If you really need hard core pinning, you can try:
+    # cpuset: "0-19"
+    # Note: some compose validators complain about cpuset; if so, omit it
+    # and rely on Intel MPI pinning (set below).
+
+    volumes:
+      - ./workspace:/workspace
+    working_dir: /workspace
+
+    environment:
+      # MPI-only defaults (1 thread per rank)
+      OMP_NUM_THREADS: "1"
+      OMP_PROC_BIND: "close"
+      OMP_PLACES: "cores"
+      MKL_NUM_THREADS: "1"
+      MKL_DYNAMIC: "FALSE"
+
+      # Intel MPI (libfabric over TCP) for containerized single-node runs
+      I_MPI_FABRICS: "shm:ofi"
+      I_MPI_OFI_PROVIDER: "tcp"
+      FI_TCP_IFACE: "eth0"
+
+      # Rank pinning (compact, core-level)
+      I_MPI_PIN: "1"
+      I_MPI_PIN_DOMAIN: "core"
+      I_MPI_PIN_ORDER: "compact"
+
+      # Optional knobs for hybrid runs (leave commented for MPI-only)
+      # KMP_BLOCKTIME: "0"
+      # KMP_HW_SUBSET: "1T"
+
+    # Bigger shared memory segment can help some workloads
+    shm_size: "4g"
+
+    ulimits:
+      nofile: 1048576
+      stack: 67108864
+
+    stdin_open: true
+    tty: true
