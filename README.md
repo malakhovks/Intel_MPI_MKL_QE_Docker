@@ -180,6 +180,29 @@ docker compose exec -d qe bash -lc "
 "
 ```
 
+**Optimized hybrid launch (10 MPI ranks × 2 threads on 20 AVX-512 cores):**
+
+```bash
+RUN_ID=fe_c_fcc_neb_fixed-hybrid-$(date +%F-%H%M%S)
+docker compose exec \
+  -e OMP_NUM_THREADS=2 \
+  -e OMP_PROC_BIND=spread \
+  -e OMP_PLACES=cores \
+  -e I_MPI_PIN_DOMAIN=omp \
+  -e I_MPI_PIN_ORDER=compact \
+  -e MKL_NUM_THREADS=1 \
+  -d qe bash -lc "
+    set -euo pipefail
+    cd /workspace
+    mkdir -p runs/$RUN_ID tmp
+    export OMP_DISPLAY_ENV=VERBOSE
+    mpirun -np 10 neb.x -in fe_c_fcc_neb_fixed.in \
+      |& tee runs/$RUN_ID/neb.out
+  "
+```
+
+> `OMP_DISPLAY_ENV=VERBOSE` prints the effective hybrid pinning at launch so you can confirm ranks/threads land on distinct cores. Drop it for production once you are satisfied with the placement.
+
 **Monitor progress:**
 ```bash
 # Live tail
