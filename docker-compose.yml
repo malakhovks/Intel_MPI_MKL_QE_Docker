@@ -42,7 +42,7 @@ services:
       # KMP_HW_SUBSET: "1T"
 
     # Bigger shared memory segment can help some workloads
-    shm_size: "4g"
+    shm_size: "8g"
 
     ulimits:
       nofile: 1048576
