@@ -132,6 +132,9 @@ docker compose exec qe bash -lc 'cat /sys/fs/cgroup/cpu.max'
 # Expected: "2000000 100000"  -> 2.0 CPU-seconds per 0.1s = 20 CPUs
 ```
 
+> **`mpiexec` vs. `mpirun`:** Intel MPI ships both wrappers, each forwarding to the same Hydra launcher (`mpiexec.hydra`). Any
+> example in this README that uses `mpirun` can be invoked with `mpiexec` instead, with identical CLI options and behavior.
+
 **Optional tiny SCF test (ensure a matching UPF exists):**
 ```bash
 docker compose exec qe bash -lc '
